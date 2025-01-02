@@ -1,16 +1,14 @@
 import { BrowserRouter, Routes, Route } from "react-router";
-import Home from "./pages/Home";
+import Overlay from "./components/Overlay";
 import Auth from "./pages/Auth";
-import Board from "./pages/Board";
-
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Overlay page="Home" />} />
         <Route path="/auth" element={<Auth />} />
-        <Route path="/board" element={<Board />} />
+        <Route path="/board" element={<Overlay page="Board" />} />
       </Routes>
     </BrowserRouter>
   );

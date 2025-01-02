@@ -1,7 +1,17 @@
+import { BrowserRouter, Routes, Route } from "react-router";
+import Home from "./pages/Home";
+import Auth from "./pages/Auth";
+import Board from "./pages/Board";
+
+
 export default function App() {
   return (
-    <h1 className="text-3xl font-bold underline">
-      Hello world!
-    </h1>
-  )
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/board" element={<Board />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }

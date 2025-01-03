@@ -1,7 +1,7 @@
 import { appSignIn, appSignOut } from "../Firebase";
 import React, { useContext } from "react";
 import { AuthContext } from "../AuthContext"; // Adjust path as needed
-
+import { Button } from "@mui/material";
 export default function Auth() {
   const { user, loading } = useContext(AuthContext);
 
@@ -11,27 +11,28 @@ export default function Auth() {
 
   if (user) {
     return (
-      <div>
-        Welcome, {user.displayName}, {user.email}, {user.uid}
-        <button
+      <div className="p-10 grid grid-rows-4">
+        <div className="">{user.displayName}</div>
+        <div>{user.email}</div>
+        <div>{user.uid}</div>
+        <Button
           onClick={appSignOut}
-          className="bg-blue-500 text-white px-4 py-2 rounded"
+          variant="contained"
         >
           Sign Out
-        </button>
+        </Button>
       </div>
     ); // Show user data after sign-in
   }
 
   return (
     <div className="auth">
-      <h1>Sign In</h1>
-      <button
+      <Button
         onClick={appSignIn}
-        className="bg-blue-500 text-white px-4 py-2 rounded"
+        variant="contained"
       >
         Sign in with Google
-      </button>
+      </Button>
     </div>
   );
 }

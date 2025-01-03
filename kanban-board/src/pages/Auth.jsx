@@ -15,10 +15,7 @@ export default function Auth() {
         <div className="">{user.displayName}</div>
         <div>{user.email}</div>
         <div>{user.uid}</div>
-        <Button
-          onClick={appSignOut}
-          variant="contained"
-        >
+        <Button onClick={appSignOut} variant="contained">
           Sign Out
         </Button>
       </div>
@@ -27,10 +24,7 @@ export default function Auth() {
 
   return (
     <div className="auth">
-      <Button
-        onClick={appSignIn}
-        variant="contained"
-      >
+      <Button onClick={appSignIn} variant="contained">
         Sign in with Google
       </Button>
     </div>

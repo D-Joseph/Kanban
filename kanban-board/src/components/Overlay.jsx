@@ -1,8 +1,6 @@
 import Board from "../pages/Board";
 import Home from "../pages/Home";
-import { Button } from "@mui/material";
 import Header from "./Header";
-
 
 export default function Overlay(props) {
   const { page } = props;
@@ -16,7 +14,7 @@ export default function Overlay(props) {
 
   return (
     <>
-      <div className="w-screen h-screen bg-yellow-300 grid grid-cols-1 place-items-center">
+      <div className="w-screen h-screen grid grid-cols-1 place-items-center">
         <div className="w-5/6 h-screen grid grid-rows-10">
           <div className="row-span-1 grid grid-cols-12">
             <Header />

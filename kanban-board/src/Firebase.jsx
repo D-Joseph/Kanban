@@ -1,5 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
+import { getFirestore } from "firebase/firestore";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "firebase/auth";
 
 const firebaseConfig = {
@@ -30,15 +31,11 @@ const appSignIn = async() => {
     // IdP data available using getAdditionalUserInfo(result)
     // ...
   }).catch((error) => {
-    // Handle Errors here.
     const errorCode = error.code;
     const errorMessage = error.message;
-    // The email of the user's account used.
     const email = error.customData.email;
-    // The AuthCredential type that was used.
     const credential = GoogleAuthProvider.credentialFromError(error);
-    // ...
-    return error
+    console.log("Error while intializing Firebase", errorCode, errorMessage, email, credential)
   })};
 
 
@@ -50,4 +47,6 @@ const appSignIn = async() => {
     })
   }
 
-export { app, analytics, appSignIn, appSignOut };
+  const db = getFirestore(app)
+
+export { app, analytics, appSignIn, appSignOut, db };

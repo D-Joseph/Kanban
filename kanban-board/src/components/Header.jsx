@@ -19,17 +19,17 @@ export default function Header() {
 
   const open = Boolean(anchorEl);
   const id = open ? "simple-popover" : undefined;
-  
+
   const nav = useNavigate();
-  const goHome = () =>{
-    nav('/')
-  }
-  
+  const goHome = () => {
+    nav("/");
+  };
+
   return (
     <>
       <div className="grid place-items-center">
         <Button onClick={goHome}>
-            <HomeIcon fontSize="large" />
+          <HomeIcon fontSize="large" />
         </Button>
       </div>
       <div className="col-span-10"></div>
@@ -47,7 +47,7 @@ export default function Header() {
             horizontal: "left",
           }}
         >
-            <Auth />
+          <Auth />
         </Popover>
       </div>
     </>

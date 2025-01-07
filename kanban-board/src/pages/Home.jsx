@@ -24,7 +24,7 @@ const createBoard = async (name, user) => {
   try {
     const docRef = await addDoc(collection(db, "boards"), {
       name: name,
-      created_by: user.displayName,
+      created_by: user.email,
       members: [user.email],
       created_at: new Date(),
     });

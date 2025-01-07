@@ -1,4 +1,6 @@
 - More consistent theme/design/colours
 - Filter items displayed in board
-- Display due date
-- Board Item modal
+
+- Add Members Bug
+  - Changed form submission from .join("\n") to regular
+  - Tried preprocessing out members into a string, but that didn't work

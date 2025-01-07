@@ -37,6 +37,7 @@ const createItem = async ({
   group,
   desc,
   boardId,
+  created_at,
   due,
   status,
 }) => {
@@ -47,9 +48,9 @@ const createItem = async ({
   try {
     const docRef = await addDoc(collection(db, "boards", boardId, "items"), {
       title,
-      by: user.displayName,
+      by: user.email,
       assignee,
-      created_at: new Date(),
+      created_at,
       priority,
       group,
       due,
@@ -80,7 +81,7 @@ export default function Board() {
     title: "",
     by: "",
     assignee: "",
-    priority: "",
+    priority: "low",
     group: "",
     desc: "",
     boardId: id,
@@ -112,6 +113,7 @@ export default function Board() {
         console.error("Error fetching board data: ", error);
       }
     };
+
     const q = collection(db, "boards", id, "items");
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const items = querySnapshot.docs.map((doc) => ({
@@ -130,6 +132,12 @@ export default function Board() {
   };
 
   const handleItemCreate = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+  
+    const date = `${year}-${month}-${day}`
     if (newItemData.title.trim() != "") {
       createItem({
         title: newItemData.title,
@@ -140,6 +148,7 @@ export default function Board() {
         desc: newItemData.desc,
         boardId: id,
         due: newItemData.due,
+        created_at: date,
         status: newItemData.status,
       });
       handleAddModalClose();
@@ -179,6 +188,14 @@ export default function Board() {
     handleSettingsClose();
   };
 
+  const displayMembers = () => {
+    let res = newBoardData.members
+    if (Array.isArray(res)){
+      res = res.join('\n')
+    }
+    return res
+  };
+  
   return (
     <>
       <div className="grid grid-cols-12 ">
@@ -221,87 +238,96 @@ export default function Board() {
         open={addModalOpen}
         onClose={handleAddModalClose}
       >
-        <DialogTitle>Create a New Board</DialogTitle>
-        <TextField
-          label="Title"
-          name="title"
-          value={newItemData.title}
-          onChange={updateFormValues}
-          margin="normal"
-          required
-        />
-
-        <FormControl margin="normal">
-          <InputLabel id="status-label">Status *</InputLabel>
-          <Select
-            labelId="status-label"
-            name="status"
-            value={newItemData.status || "icebox"}
+        <div className="grid grid-rows-4 place-content-center">
+          <DialogTitle>Add a New Task</DialogTitle>
+          <TextField
+            label="Title"
+            name="title"
+            value={newItemData.title}
             onChange={updateFormValues}
+            margin="normal"
             required
-          >
-            <MenuItem value="icebox">Icebox</MenuItem>
-            <MenuItem value="queued">Queued</MenuItem>
-            <MenuItem value="working">Working</MenuItem>
-            <MenuItem value="review">Review</MenuItem>
-            <MenuItem value="completed">Completed</MenuItem>
-          </Select>
-        </FormControl>
-        <TextField
-          label="Assignee"
-          name="assignee"
-          value={newItemData.assignee}
-          onChange={updateFormValues}
-          margin="normal"
-        />
+          />
 
-        <FormControl margin="normal">
-          <InputLabel id="priority-label">Priority</InputLabel>
-          <Select
-            labelId="priority-label"
-            name="priority"
-            value={newItemData.priority}
-            onChange={updateFormValues}
-          >
-            <MenuItem value="low">Low</MenuItem>
-            <MenuItem value="medium">Medium</MenuItem>
-            <MenuItem value="high">High</MenuItem>
-          </Select>
-        </FormControl>
+          <div className="grid grid-cols-5 gap-2 place-content-center">
+            <div className="col-span-2">
+            <FormControl margin="normal" sx = {{ width: "100%"}}>
+              <InputLabel id="status-label">Status *</InputLabel>
+              <Select
+                labelId="status-label"
+                name="status"
+                value={newItemData.status || "icebox"}
+                onChange={updateFormValues}
+                required
+              >
+                <MenuItem value="icebox">Icebox</MenuItem>
+                <MenuItem value="queued">Queued</MenuItem>
+                <MenuItem value="working">Working</MenuItem>
+                <MenuItem value="review">Review</MenuItem>
+                <MenuItem value="completed">Completed</MenuItem>
+              </Select>
+            </FormControl>
+            </div>
+            <div className="col-span-2" >
+            <TextField
+              label="Due Date"
+              name="due"
+              value={newItemData.due}
+              onChange={updateFormValues}
+              margin="normal"
+              sx = {{ width: "100%"}}
+              type="date"
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+            </div>
 
-        <FormControl margin="normal">
+            <FormControl margin="normal" sx={[{ width: "100%" }]}>
+              <InputLabel id="priority-label">Priority</InputLabel>
+              <Select
+                labelId="priority-label"
+                name="priority"
+                sx={{ width: "100px" }}
+                value={newItemData.priority || "low"}
+                onChange={updateFormValues}
+              >
+                <MenuItem value="low">Low</MenuItem>
+                <MenuItem value="medium">Medium</MenuItem>
+                <MenuItem value="high">High</MenuItem>
+              </Select>
+            </FormControl>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 place-content-center">
+            <TextField
+              label="Group/Subteam"
+              name="group"
+              value={newItemData.group}
+              onChange={updateFormValues}
+              fullWidth={true}
+              margin="normal"
+            />
+            <TextField
+              label="Assigned To"
+              name="assignee"
+              value={newItemData.assignee}
+              fullWidth={true}
+              onChange={updateFormValues}
+              margin="normal"
+            />
+          </div>
+
           <TextField
-            label="Group/Subteam"
-            name="group"
-            value={newItemData.group}
+            label="Description"
+            name="desc"
+            value={newItemData.desc}
             onChange={updateFormValues}
+            multiline
+            rows={4}
             margin="normal"
           />
-        </FormControl>
-
-        <TextField
-          label="Description"
-          name="desc"
-          value={newItemData.desc}
-          onChange={updateFormValues}
-          multiline
-          rows={4}
-          margin="normal"
-        />
-
-        <FormControl margin="normal">
-          <TextField
-            label="Due Date"
-            name="due"
-            value={newItemData.due}
-            onChange={updateFormValues}
-            margin="normal"
-            type="date"
-            InputLabelProps={{
-              shrink: true,
-            }}
-          />
-        </FormControl>
+        </div>
         <DialogActions>
           <Button onClick={handleAddModalClose} color="primary">
             Cancel
@@ -334,9 +360,9 @@ export default function Board() {
             />
 
             <TextField
-              label="Members"
+              label="Members (1 Per Line)"
               name="members"
-              value={newBoardData.members.join('\n')}
+              value={displayMembers()}
               onChange={updateSettings}
               margin="normal"
               multiline

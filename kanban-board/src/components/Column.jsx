@@ -1,6 +1,5 @@
-
-import BoardItem from './BoardItem';
-export default function Column({ name, items }) {
+import BoardItem from "./BoardItem";
+export default function Column({ name, items, boardId }) {
   return (
     <>
       <div>
@@ -9,7 +8,7 @@ export default function Column({ name, items }) {
         </h1>
         <div className="grid grid-cols-1">
           {items.map((item) => (
-            <BoardItem key={item.id} item={item}/>
+            <BoardItem key={item.id} item={item} />
           ))}
         </div>
       </div>

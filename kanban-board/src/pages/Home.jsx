@@ -1,9 +1,8 @@
 import * as React from "react";
 import Button from "@mui/material/Button";
-import { appSignIn, db } from "../Firebase";
+import { db } from "../Firebase";
 import {
   collection,
-  getDocs,
   addDoc,
   onSnapshot,
   query,
@@ -39,12 +38,6 @@ export default function Home() {
   const { user, loading } = React.useContext(AuthContext);
   const [open, setOpen] = React.useState(false); // Dialog open state
   const [boardName, setBoardName] = React.useState(""); // State to handle form input
-
-  // Force user sign in if not logged in
-  if (!loading && !user) {
-    appSignIn();
-  }
-
   const [boards, setBoards] = React.useState([]);
 
   React.useEffect(() => {
@@ -68,6 +61,7 @@ export default function Home() {
     }
   }, [user]);
 
+  // State Management for Add Modal
   const handleClickOpen = () => {
     setOpen(true);
   };

@@ -19,6 +19,7 @@ import { useParams } from "react-router-dom";
 import PersonIcon from '@mui/icons-material/Person';
 import GroupsIcon from '@mui/icons-material/Groups';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import { useDrag } from "react-dnd";
 const editItemData = async (boardId, updated) => {
   try {
     await updateDoc(doc(db, "boards", boardId, "items", updated.id), {
@@ -51,7 +52,13 @@ export default function BoardItem(item) {
   const [viewItem, setViewItem] = React.useState(false);
   const [editedItem, setEditedItem] = React.useState(item)
 
-
+  const [{ isDragging }, drag] = useDrag(() => ({
+    type: "BOARD_ITEM",
+    item: { id: item.id, status: item.status }, // Pass the item data
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  }));
   
   const handleModalClose = () => {
     setEditedItem(item)
@@ -78,6 +85,11 @@ export default function BoardItem(item) {
 
   return (
     <>
+        <div
+      ref={drag}
+      style={{ opacity: isDragging ? 0.5 : 1 }}
+      className="w-full text-left truncate rounded-lg text-xs grid grid-cols-1"
+    >
       <Button
         onClick={() => {
           setViewItem(true);
@@ -98,13 +110,14 @@ export default function BoardItem(item) {
                 )}
                 {item.priority == "medium" && <KeyboardArrowUpIcon />}
               </Tooltip>
+                {item.priority == "low" && <KeyboardArrowUpIcon sx={{color:'#ffffff'}}/>}
             </div>
           </div>
           <div><PersonIcon fontSize="small"/> {item.assignee}</div>
           <div><GroupsIcon fontSize="small"/> {item.group}</div>
           <div><CalendarMonthIcon fontSize="small"/> {item.due}</div>
         </div>
-      </Button>
+      </Button> </div>
 
       <Dialog fullWidth={true} open={viewItem} onClose={handleModalClose}>
         <div className="grid grid-rows-4 place-content-center">

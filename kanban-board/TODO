@@ -1,6 +1,5 @@
-- More consistent theme/design/colours
-- Filter items displayed in board
-
-- Add Members Bug
-  - Changed form submission from .join("\n") to regular
-  - Tried preprocessing out members into a string, but that didn't work
+- Groups:
+  - Add groups during board creation
+  - Filter by groups
+  - Select group in add item dropdown
+  - Add group if not exist

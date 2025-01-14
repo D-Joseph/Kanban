@@ -29,7 +29,7 @@ export default function Column({ name, items }) {
   };
 
   return (
-    <div ref={drop} className="mt-4">
+    <div ref={drop} className="mt-4 min-w-60">
       <h1 className="text-lg text-center font-bold underline text-muiBlue">{name}</h1>
       <div className="grid grid-cols-1">
         {items.map((item) => (

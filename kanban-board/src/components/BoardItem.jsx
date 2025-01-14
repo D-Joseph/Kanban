@@ -88,7 +88,7 @@ export default function BoardItem(item) {
         <div
       ref={drag}
       style={{ opacity: isDragging ? 0.5 : 1 }}
-      className="w-full text-left truncate rounded-lg text-xs grid grid-cols-1"
+      className="w-full text-left min-w-60 truncate rounded-lg text-xs grid grid-cols-1"
     >
       <Button
         onClick={() => {
@@ -97,7 +97,7 @@ export default function BoardItem(item) {
       >
         <div
           key={item.id}
-          className="p-1 m-1 w-full text-left truncate rounded-lg border-2 text-xs grid grid-cols-1 grid-rows-4 border-muiBlue"
+          className="p-1 m-1 w-60 text-left truncate rounded-lg border-2 text-xs grid grid-cols-1 grid-rows-4 border-muiBlue"
         >
           <div className="grid grid-cols-5">
             <div className="font-bold col-span-4 truncate text-sm">

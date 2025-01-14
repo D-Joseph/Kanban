@@ -29,7 +29,9 @@ import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import TextField from "@mui/material/TextField";
 import { updateEmail } from "firebase/auth";
 import { DndProvider } from "react-dnd";
+import GroupsIcon from "@mui/icons-material/Groups";
 import { HTML5Backend } from "react-dnd-html5-backend";
+
 const createItem = async ({
   title,
   user,
@@ -93,6 +95,7 @@ export default function Board() {
   const { user, authLoading } = React.useContext(AuthContext);
   const [addModalOpen, setAddModalOpen] = React.useState(false);
   const [boardSettingsOpen, setBoardSettingsOpen] = React.useState(false);
+  const [groupFilter, setGroupFilter] = React.useState("");
   const [newItemData, setNewItemData] = React.useState(initialFormData);
   const columns = ["Icebox", "Queued", "Working", "Review", "Completed"];
   const [boardData, setBoardData] = React.useState(null);
@@ -197,40 +200,69 @@ export default function Board() {
     return res;
   };
 
+  const applyGroupFilter = (e) => {
+    setGroupFilter(e.target.value);
+  };
   return (
     <>
       <DndProvider backend={HTML5Backend}>
-        <div className="grid grid-cols-12 ">
-          <h1 className="text-3xl text-muiBlue font-bold text-nowrap ml-4">
+        <div className="flex items-center justify-between gap-4 p-2">
+          <h1 className="text-3xl text-muiBlue font-bold whitespace-nowrap ml-4">
             {newBoardData ? newBoardData.name : "loading"}
           </h1>
-          <div className="col-span-9"></div>
-          <Button
-            onClick={() => {
-              setBoardSettingsOpen(true);
-            }}
-          >
-            <SettingsOutlinedIcon />
-          </Button>
+          <div className="flex-grow"></div>
+          {boardData && boardData.groups && (
+            <FormControl margin="normal" sx={{ width: "120px" }}>
+              <InputLabel id="group-filter-label">
+                <GroupsIcon />
+              </InputLabel>
+              <Select
+                labelId="group-filter-label"
+                name="group"
+                value={groupFilter}
+                onChange={applyGroupFilter}
+                sx={{ width: "120px", height: "33px" }}
+              >
+                <MenuItem value="">None</MenuItem>
+                {boardData.groups.map((group) => (
+                  <MenuItem key={group} value={group}>
+                    {group}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )}
+
+          {boardData && user.email === boardData.created_by && (
+            <Button
+              onClick={() => setBoardSettingsOpen(true)}
+              sx={{ minWidth: 40 }}
+            >
+              <SettingsOutlinedIcon />
+            </Button>
+          )}
+
           <Button
             variant="contained"
             size="medium"
-            onClick={() => {
-              setAddModalOpen(true);
-            }}
+            onClick={() => setAddModalOpen(true)}
+            sx={{ minWidth: 100 }}
             endIcon={<AddCircleIcon />}
           >
             Add
           </Button>
         </div>
-        <div className="size-full">
-          <div className="overflow-auto h-full grid gap-x-6 grid-cols-5">
+
+        <div className="overflow-x-auto">
+          <div className="min-w-max h-full grid gap-x-6 grid-cols-5">
             {columns.map((col) => (
               <Column
                 key={col}
                 name={col}
                 items={items.filter(
-                  (item) => item.status === col.toLowerCase()
+                  (item) =>
+                    item.status === col.toLowerCase() &&
+                    (groupFilter === "" || item.group === groupFilter)
                 )}
               />
             ))}

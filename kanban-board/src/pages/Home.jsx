@@ -79,11 +79,11 @@ export default function Home() {
   };
 
   return (
-    <div>
+    <div className="">
       <h1 className="text-3xl text-center font-bold underline text-muiBlue">
         Your Boards
       </h1>
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-4 p-4">
+      <div className=" grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-4 p-4">
         <Button
           className="h-32 w-32"
           variant="contained"

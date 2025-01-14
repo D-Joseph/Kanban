@@ -22,8 +22,8 @@ export default function Overlay(props) {
   return (
     <>
       <div className="w-screen h-screen grid grid-cols-1 place-items-center">
-        <div className="w-11/12 h-screen grid grid-rows-10">
-          <div className="row-span-1 grid grid-cols-12">
+        <div className="h-screen grid grid-cols-1 grid-rows-10">
+          <div className="w-screen row-span-1 grid grid-cols-12">
             <Header />
           </div>
           <div className="row-span-9">{elem}</div>

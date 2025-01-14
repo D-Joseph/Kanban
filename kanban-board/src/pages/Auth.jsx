@@ -14,7 +14,6 @@ export default function Auth() {
       <div className="p-10 grid grid-rows-4">
         <div className="">{user.displayName}</div>
         <div>{user.email}</div>
-        <div>{user.uid}</div>
         <Button onClick={appSignOut} variant="contained">
           Sign Out
         </Button>

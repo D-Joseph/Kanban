@@ -22,12 +22,9 @@ import {
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import DialogTitle from "@mui/material/DialogTitle";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import TextField from "@mui/material/TextField";
-import { updateEmail } from "firebase/auth";
 import { DndProvider } from "react-dnd";
 import GroupsIcon from "@mui/icons-material/Groups";
 import { HTML5Backend } from "react-dnd-html5-backend";

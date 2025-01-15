@@ -10,14 +10,12 @@ import {
 } from "firebase/firestore";
 import HomeTile from "../components/HomeTile";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
-import FormDialog from "../components/FormDialog"; // Assuming this component exists
 import { AuthContext } from "../AuthContext";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import TextField from "@mui/material/TextField";
-import { Alert } from "@mui/material";
 
 // Function to create a new board
 const createBoard = async (name, user) => {

@@ -16,10 +16,11 @@ import * as React from "react";
 import { doc, updateDoc, deleteDoc } from "firebase/firestore";
 import { db } from "../Firebase";
 import { useParams } from "react-router-dom";
-import PersonIcon from '@mui/icons-material/Person';
-import GroupsIcon from '@mui/icons-material/Groups';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import PersonIcon from "@mui/icons-material/Person";
+import GroupsIcon from "@mui/icons-material/Groups";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import { useDrag } from "react-dnd";
+import { useGroups } from "../GroupsContext";
 const editItemData = async (boardId, updated) => {
   try {
     await updateDoc(doc(db, "boards", boardId, "items", updated.id), {
@@ -37,20 +38,22 @@ const editItemData = async (boardId, updated) => {
   }
 };
 
-const deleteItem = async(boardId, updated) => {
+const deleteItem = async (boardId, updated) => {
   try {
     await deleteDoc(doc(db, "boards", boardId, "items", updated.id));
     console.log("Item Deleted");
   } catch (error) {
     console.error("Error deleting item: ", error);
   }
-} 
+};
 
 export default function BoardItem(item) {
   item = item.item;
+  const groups = useGroups();  
+  console.log(groups)
   const { id } = useParams();
   const [viewItem, setViewItem] = React.useState(false);
-  const [editedItem, setEditedItem] = React.useState(item)
+  const [editedItem, setEditedItem] = React.useState(item);
 
   const [{ isDragging }, drag] = useDrag(() => ({
     type: "BOARD_ITEM",
@@ -59,9 +62,9 @@ export default function BoardItem(item) {
       isDragging: monitor.isDragging(),
     }),
   }));
-  
+
   const handleModalClose = () => {
-    setEditedItem(item)
+    setEditedItem(item);
     setViewItem(false);
   };
 
@@ -74,50 +77,59 @@ export default function BoardItem(item) {
   };
 
   const handleItemCreate = () => {
-    editItemData(id, editedItem)
+    editItemData(id, editedItem);
     setViewItem(false);
     // handleModalClose()
   };
 
   const handleItemDelete = () => {
-    deleteItem(id, editedItem)
-  }
+    deleteItem(id, editedItem);
+  };
 
   return (
     <>
-        <div
-      ref={drag}
-      style={{ opacity: isDragging ? 0.5 : 1 }}
-      className="w-full text-left min-w-60 truncate rounded-lg text-xs grid grid-cols-1"
-    >
-      <Button
-        onClick={() => {
-          setViewItem(true);
-        }}
+      <div
+        ref={drag}
+        style={{ opacity: isDragging ? 0.5 : 1 }}
+        className="w-full text-left min-w-60 truncate rounded-lg text-xs grid grid-cols-1"
       >
-        <div
-          key={item.id}
-          className="p-1 m-1 w-60 text-left truncate rounded-lg border-2 text-xs grid grid-cols-1 grid-rows-4 border-muiBlue"
+        <Button
+          onClick={() => {
+            setViewItem(true);
+          }}
         >
-          <div className="grid grid-cols-5">
-            <div className="font-bold col-span-4 truncate text-sm">
-              {item.title}
-            </div>
-            <div className="text-right">
-              <Tooltip title={"Priority: " + item.priority}>
-                {item.priority == "high" && (
-                  <KeyboardDoubleArrowUpIcon color="red" />
+          <div
+            key={item.id}
+            className="p-1 m-1 w-60 text-left truncate rounded-lg border-2 text-xs grid grid-cols-1 grid-rows-4 border-muiBlue"
+          >
+            <div className="grid grid-cols-5">
+              <div className="font-bold col-span-4 truncate text-sm">
+                {item.title}
+              </div>
+              <div className="text-right">
+                <Tooltip title={"Priority: " + item.priority}>
+                  {item.priority == "high" && (
+                    <KeyboardDoubleArrowUpIcon color="red" />
+                  )}
+                  {item.priority == "medium" && <KeyboardArrowUpIcon />}
+                </Tooltip>
+                {item.priority == "low" && (
+                  <KeyboardArrowUpIcon sx={{ color: "#ffffff" }} />
                 )}
-                {item.priority == "medium" && <KeyboardArrowUpIcon />}
-              </Tooltip>
-                {item.priority == "low" && <KeyboardArrowUpIcon sx={{color:'#ffffff'}}/>}
+              </div>
+            </div>
+            <div>
+              <PersonIcon fontSize="small" /> {item.assignee}
+            </div>
+            <div>
+              <GroupsIcon fontSize="small" /> {item.group}
+            </div>
+            <div>
+              <CalendarMonthIcon fontSize="small" /> {item.due}
             </div>
           </div>
-          <div><PersonIcon fontSize="small"/> {item.assignee}</div>
-          <div><GroupsIcon fontSize="small"/> {item.group}</div>
-          <div><CalendarMonthIcon fontSize="small"/> {item.due}</div>
-        </div>
-      </Button> </div>
+        </Button>{" "}
+      </div>
 
       <Dialog fullWidth={true} open={viewItem} onClose={handleModalClose}>
         <div className="grid grid-rows-4 place-content-center">
@@ -182,14 +194,24 @@ export default function BoardItem(item) {
           </div>
 
           <div className="grid grid-cols-2 gap-2 place-content-center">
-            <TextField
-              label="Group/Subteam"
-              name="group"
-              value={editedItem.group}
-              onChange={updateFormValues}
-              fullWidth={true}
-              margin="normal"
-            />
+            <FormControl margin="normal">
+              <InputLabel id="group-label">Group/Subteam</InputLabel>
+              <Select
+                labelId="group-label"
+                name="group"
+                value={editedItem.group}
+                onChange={updateFormValues}
+                fullWidth={true}
+              >
+                <MenuItem value="">&nbsp;</MenuItem>
+                {groups &&
+                  groups.map((group) => (
+                    <MenuItem key={group} value={group}>
+                      {group}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
             <TextField
               label="Assigned To"
               name="assignee"

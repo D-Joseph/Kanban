@@ -1,5 +1,4 @@
 - Groups:
   - Add groups during board creation
-  - Filter by groups
   - Select group in add item dropdown
   - Add group if not exist

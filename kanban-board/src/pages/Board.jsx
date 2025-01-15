@@ -31,6 +31,7 @@ import { updateEmail } from "firebase/auth";
 import { DndProvider } from "react-dnd";
 import GroupsIcon from "@mui/icons-material/Groups";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { GroupsProvider } from "../GroupsContext";
 
 const createItem = async ({
   title,
@@ -100,6 +101,7 @@ export default function Board() {
   const columns = ["Icebox", "Queued", "Working", "Review", "Completed"];
   const [boardData, setBoardData] = React.useState(null);
   const [newBoardData, setNewBoardData] = React.useState(null);
+  const [groups, setGroups] = React.useState([]);
 
   React.useEffect(() => {
     if (!id) return;
@@ -109,6 +111,7 @@ export default function Board() {
         if (boardDoc.exists()) {
           setBoardData(boardDoc.data());
           setNewBoardData(boardDoc.data());
+          setGroups(boardDoc.data().groups)
         } else {
           console.error("No such board found!");
           return null;
@@ -204,228 +207,243 @@ export default function Board() {
     setGroupFilter(e.target.value);
   };
   return (
-    <>
+    <GroupsProvider groups={groups}>
       <DndProvider backend={HTML5Backend}>
-        <div className="flex items-center justify-between gap-4 p-2">
-          <h1 className="text-3xl text-muiBlue font-bold whitespace-nowrap ml-4">
-            {newBoardData ? newBoardData.name : "loading"}
-          </h1>
-          <div className="flex-grow"></div>
-          {boardData && boardData.groups && (
-            <FormControl margin="normal" sx={{ width: "120px" }}>
-              <InputLabel id="group-filter-label">
-                <GroupsIcon />
-              </InputLabel>
-              <Select
-                labelId="group-filter-label"
-                name="group"
-                value={groupFilter}
-                onChange={applyGroupFilter}
-                sx={{ width: "120px", height: "33px" }}
+        <>
+          <div className="flex items-center justify-between gap-4 p-2">
+            <h1 className="text-3xl text-muiBlue font-bold whitespace-nowrap ml-4">
+              {newBoardData ? newBoardData.name : "loading"}
+            </h1>
+            <div className="flex-grow"></div>
+            {boardData && boardData.groups && (
+              <FormControl margin="normal" sx={{ width: "120px" }}>
+                <InputLabel id="group-filter-label">
+                  <GroupsIcon />
+                </InputLabel>
+                <Select
+                  labelId="group-filter-label"
+                  name="group"
+                  value={groupFilter}
+                  onChange={applyGroupFilter}
+                  sx={{ width: "120px", height: "33px" }}
+                >
+                  <MenuItem value="">None</MenuItem>
+                  {boardData.groups.map((group) => (
+                    <MenuItem key={group} value={group}>
+                      {group}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            )}
+
+            {boardData && user.email === boardData.created_by && (
+              <Button
+                onClick={() => setBoardSettingsOpen(true)}
+                sx={{ minWidth: 40 }}
               >
-                <MenuItem value="">None</MenuItem>
-                {boardData.groups.map((group) => (
-                  <MenuItem key={group} value={group}>
-                    {group}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          )}
+                <SettingsOutlinedIcon />
+              </Button>
+            )}
 
-          {boardData && user.email === boardData.created_by && (
             <Button
-              onClick={() => setBoardSettingsOpen(true)}
-              sx={{ minWidth: 40 }}
+              variant="contained"
+              size="medium"
+              onClick={() => setAddModalOpen(true)}
+              sx={{ minWidth: 100 }}
+              endIcon={<AddCircleIcon />}
             >
-              <SettingsOutlinedIcon />
+              Add
             </Button>
-          )}
-
-          <Button
-            variant="contained"
-            size="medium"
-            onClick={() => setAddModalOpen(true)}
-            sx={{ minWidth: 100 }}
-            endIcon={<AddCircleIcon />}
-          >
-            Add
-          </Button>
-        </div>
-
-        <div className="overflow-x-auto">
-          <div className="min-w-max h-full grid gap-x-6 grid-cols-5">
-            {columns.map((col) => (
-              <Column
-                key={col}
-                name={col}
-                items={items.filter(
-                  (item) =>
-                    item.status === col.toLowerCase() &&
-                    (groupFilter === "" || item.group === groupFilter)
-                )}
-              />
-            ))}
           </div>
-        </div>
 
-        <Dialog
-          fullWidth={true}
-          open={addModalOpen}
-          onClose={handleAddModalClose}
-        >
-          <div className="grid grid-rows-4 place-content-center">
-            <DialogTitle>Add a New Task</DialogTitle>
-            <TextField
-              label="Title"
-              name="title"
-              value={newItemData.title}
-              onChange={updateFormValues}
-              margin="normal"
-              required
-            />
+          <div className="overflow-x-auto">
+            <div className="min-w-max h-full grid gap-x-6 grid-cols-5">
+              {columns.map((col) => (
+                <Column
+                  key={col}
+                  name={col}
+                  items={items.filter(
+                    (item) =>
+                      item.status === col.toLowerCase() &&
+                      (groupFilter === "" || item.group === groupFilter)
+                  )}
+                />
+              ))}
+            </div>
+          </div>
 
-            <div className="grid grid-cols-5 gap-2 place-content-center">
-              <div className="col-span-2">
-                <FormControl margin="normal" sx={{ width: "100%" }}>
-                  <InputLabel id="status-label">Status *</InputLabel>
-                  <Select
-                    labelId="status-label"
-                    name="status"
-                    value={newItemData.status || "icebox"}
+          <Dialog
+            fullWidth={true}
+            open={addModalOpen}
+            onClose={handleAddModalClose}
+          >
+            <div className="grid grid-rows-4 place-content-center">
+              <DialogTitle>Add a New Task</DialogTitle>
+              <TextField
+                label="Title"
+                name="title"
+                value={newItemData.title}
+                onChange={updateFormValues}
+                margin="normal"
+                required
+              />
+
+              <div className="grid grid-cols-5 gap-2 place-content-center">
+                <div className="col-span-2">
+                  <FormControl margin="normal" sx={{ width: "100%" }}>
+                    <InputLabel id="status-label">Status *</InputLabel>
+                    <Select
+                      labelId="status-label"
+                      name="status"
+                      value={newItemData.status || "icebox"}
+                      onChange={updateFormValues}
+                      required
+                    >
+                      <MenuItem value="icebox">Icebox</MenuItem>
+                      <MenuItem value="queued">Queued</MenuItem>
+                      <MenuItem value="working">Working</MenuItem>
+                      <MenuItem value="review">Review</MenuItem>
+                      <MenuItem value="completed">Completed</MenuItem>
+                    </Select>
+                  </FormControl>
+                </div>
+                <div className="col-span-2">
+                  <TextField
+                    label="Due Date"
+                    name="due"
+                    value={newItemData.due}
                     onChange={updateFormValues}
-                    required
+                    margin="normal"
+                    sx={{ width: "100%" }}
+                    type="date"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                  />
+                </div>
+
+                <FormControl margin="normal" sx={[{ width: "100%" }]}>
+                  <InputLabel id="priority-label">Priority</InputLabel>
+                  <Select
+                    labelId="priority-label"
+                    name="priority"
+                    sx={{ width: "100px" }}
+                    value={newItemData.priority || "low"}
+                    onChange={updateFormValues}
                   >
-                    <MenuItem value="icebox">Icebox</MenuItem>
-                    <MenuItem value="queued">Queued</MenuItem>
-                    <MenuItem value="working">Working</MenuItem>
-                    <MenuItem value="review">Review</MenuItem>
-                    <MenuItem value="completed">Completed</MenuItem>
+                    <MenuItem value="low">Low</MenuItem>
+                    <MenuItem value="medium">Medium</MenuItem>
+                    <MenuItem value="high">High</MenuItem>
                   </Select>
                 </FormControl>
               </div>
-              <div className="col-span-2">
+
+              <div className="grid grid-cols-2 gap-2 place-content-center">
+                <FormControl margin="normal">
+                  <InputLabel id="group-label">Group/Subteam</InputLabel>
+                  <Select
+                    labelId="group-label"
+                    name="group"
+                    value={newItemData.group}
+                    onChange={updateFormValues}
+                    fullWidth={true}
+                  >
+                    <MenuItem value="">&nbsp;</MenuItem>
+                    {boardData &&
+                      boardData.groups &&
+                      boardData.groups.map((group) => (
+                        <MenuItem key={group} value={group}>
+                          {group}
+                        </MenuItem>
+                      ))}
+                  </Select>
+                </FormControl>
+
                 <TextField
-                  label="Due Date"
-                  name="due"
-                  value={newItemData.due}
+                  label="Assigned To"
+                  name="assignee"
+                  value={newItemData.assignee}
+                  fullWidth={true}
                   onChange={updateFormValues}
                   margin="normal"
-                  sx={{ width: "100%" }}
-                  type="date"
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
                 />
               </div>
 
-              <FormControl margin="normal" sx={[{ width: "100%" }]}>
-                <InputLabel id="priority-label">Priority</InputLabel>
-                <Select
-                  labelId="priority-label"
-                  name="priority"
-                  sx={{ width: "100px" }}
-                  value={newItemData.priority || "low"}
-                  onChange={updateFormValues}
-                >
-                  <MenuItem value="low">Low</MenuItem>
-                  <MenuItem value="medium">Medium</MenuItem>
-                  <MenuItem value="high">High</MenuItem>
-                </Select>
-              </FormControl>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2 place-content-center">
               <TextField
-                label="Group/Subteam"
-                name="group"
-                value={newItemData.group}
+                label="Description"
+                name="desc"
+                value={newItemData.desc}
                 onChange={updateFormValues}
-                fullWidth={true}
-                margin="normal"
-              />
-              <TextField
-                label="Assigned To"
-                name="assignee"
-                value={newItemData.assignee}
-                fullWidth={true}
-                onChange={updateFormValues}
-                margin="normal"
-              />
-            </div>
-
-            <TextField
-              label="Description"
-              name="desc"
-              value={newItemData.desc}
-              onChange={updateFormValues}
-              multiline
-              rows={4}
-              margin="normal"
-            />
-          </div>
-          <DialogActions>
-            <Button onClick={handleAddModalClose} color="primary">
-              Cancel
-            </Button>
-            <Button
-              onClick={handleItemCreate}
-              color="primary"
-              disabled={newItemData.title.trim() === ""}
-            >
-              Create
-            </Button>
-          </DialogActions>
-        </Dialog>
-
-        <Dialog
-          fullWidth={true}
-          open={boardSettingsOpen}
-          onClose={handleSettingsClose}
-        >
-          <DialogTitle>Board Settings</DialogTitle>
-          {newBoardData ? (
-            <>
-              <TextField
-                label="Board Title"
-                name="name"
-                value={newBoardData.name}
-                onChange={updateSettings}
-                margin="normal"
-                required
-              />
-
-              <TextField
-                label="Members (1 Per Line)"
-                name="members"
-                value={displayMembers()}
-                onChange={updateSettings}
-                margin="normal"
                 multiline
-                rows={5}
-                required
+                rows={4}
+                margin="normal"
               />
-            </>
-          ) : (
-            <p>Loading board data...</p>
-          )}
-          <DialogActions>
-            <Button
-              onClick={handleSettingsSave}
-              disabled={
-                boardData &&
-                newBoardData &&
-                newBoardData.members.toString() != "" &&
-                boardData.name == newBoardData.name &&
-                newBoardData.members.toString() == boardData.members.toString()
-              }
-              color="primary"
-            >
-              Save Changes
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </DndProvider>
-    </>
+            </div>
+            <DialogActions>
+              <Button onClick={handleAddModalClose} color="primary">
+                Cancel
+              </Button>
+              <Button
+                onClick={handleItemCreate}
+                color="primary"
+                disabled={newItemData.title.trim() === ""}
+              >
+                Create
+              </Button>
+            </DialogActions>
+          </Dialog>
+
+          <Dialog
+            fullWidth={true}
+            open={boardSettingsOpen}
+            onClose={handleSettingsClose}
+          >
+            <DialogTitle>Board Settings</DialogTitle>
+            {newBoardData ? (
+              <>
+                <TextField
+                  label="Board Title"
+                  name="name"
+                  value={newBoardData.name}
+                  onChange={updateSettings}
+                  margin="normal"
+                  required
+                />
+
+                <TextField
+                  label="Members (1 Per Line)"
+                  name="members"
+                  value={displayMembers()}
+                  onChange={updateSettings}
+                  margin="normal"
+                  multiline
+                  rows={5}
+                  required
+                />
+              </>
+            ) : (
+              <p>Loading board data...</p>
+            )}
+            <DialogActions>
+              <Button
+                onClick={handleSettingsSave}
+                disabled={
+                  boardData &&
+                  newBoardData &&
+                  newBoardData.members.toString() != "" &&
+                  boardData.name == newBoardData.name &&
+                  newBoardData.members.toString() ==
+                    boardData.members.toString()
+                }
+                color="primary"
+              >
+                Save Changes
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </>
+      </DndProvider>{" "}
+    </GroupsProvider>
   );
 }

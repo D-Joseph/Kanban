@@ -33,7 +33,7 @@ export default function Column({ name, items }) {
       <h1 className="text-lg text-center font-bold underline text-muiBlue">{name}</h1>
       <div className="grid grid-cols-1">
         {items.map((item) => (
-          <BoardItem key={item.id} item={item} />
+          <BoardItem key={item.id} item={item}/>
         ))}
       </div>
     </div>

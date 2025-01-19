@@ -11,7 +11,7 @@ export default function Auth() {
 
   if (user) {
     return (
-      <div className="p-10 grid grid-rows-4">
+      <div className="p-10 grid grid-rows-3">
         <div className="">{user.displayName}</div>
         <div>{user.email}</div>
         <Button onClick={appSignOut} variant="contained">

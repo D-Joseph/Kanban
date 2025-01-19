@@ -212,8 +212,8 @@ export default function Board() {
               {newBoardData ? newBoardData.name : "loading"}
             </h1>
             <div className="flex-grow"></div>
-            {boardData && boardData.groups && (
-              <FormControl margin="normal" sx={{ width: "120px" }}>
+   {boardData && boardData.groups && (
+              <FormControl  sx={{ width: "120px" }}>
                 <InputLabel id="group-filter-label">
                   <GroupsIcon />
                 </InputLabel>
@@ -222,7 +222,7 @@ export default function Board() {
                   name="group"
                   value={groupFilter}
                   onChange={applyGroupFilter}
-                  sx={{ width: "120px", height: "33px" }}
+                  sx={{ width: "120px", height: "36px" }}
                 >
                   <MenuItem value="">None</MenuItem>
                   {boardData.groups.map((group) => (
@@ -237,7 +237,7 @@ export default function Board() {
             {boardData && user.email === boardData.created_by && (
               <Button
                 onClick={() => setBoardSettingsOpen(true)}
-                sx={{ minWidth: 40 }}
+                sx={{ minWidth: 40}}
               >
                 <SettingsOutlinedIcon />
               </Button>
